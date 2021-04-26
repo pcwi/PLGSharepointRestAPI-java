@@ -7,6 +7,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Collections;
 
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -22,19 +23,17 @@ import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.common.collect.Lists;
-
 public class StreamRestTemplate extends RestTemplate {
 	private static final DeferredCloseClientHttpRequestInterceptor deferredCloseClientHttpRequestInterceptor =
 			new DeferredCloseClientHttpRequestInterceptor();
 
 	public StreamRestTemplate() {
-		super.setInterceptors(Lists.newArrayList(deferredCloseClientHttpRequestInterceptor));
+		super.setInterceptors(Collections.singletonList(deferredCloseClientHttpRequestInterceptor));
 	}
 
 	public StreamRestTemplate(ClientHttpRequestFactory requestFactory) {
 		super(requestFactory);
-		super.setInterceptors(Lists.newArrayList(deferredCloseClientHttpRequestInterceptor));
+		super.setInterceptors(Collections.singletonList(deferredCloseClientHttpRequestInterceptor));
 		List<HttpMessageConverter<?>> msgConverters = getMessageConverters();
 		List<HttpMessageConverter<?>> toRemove = new ArrayList<>();
 		for (HttpMessageConverter<?> converter : msgConverters) {
@@ -56,7 +55,7 @@ public class StreamRestTemplate extends RestTemplate {
 		if (interceptorExists && interceptors.get(0) == deferredCloseClientHttpRequestInterceptor) {
 			return interceptors;
 		}
-		LinkedList<ClientHttpRequestInterceptor> newInterceptors = Lists.newLinkedList();
+		LinkedList<ClientHttpRequestInterceptor> newInterceptors = new LinkedList();
 		newInterceptors.addAll(interceptors);
 		if (interceptorExists) {
 			newInterceptors.remove(deferredCloseClientHttpRequestInterceptor);
